@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import sqlite3
+import os
 
 janela = Tk()
 
@@ -44,6 +45,26 @@ ORDER BY SUM(CAST(horas AS INTEGER)) DESC
 for item in dados:
     tabela.insert("", END, values=item)
 
-conexao.close()
+conexao.close()  
 
+# FUNÇÃO VOLTAR
+
+def voltar_menu():
+
+    janela.destroy()
+
+    os.system("python main.py")
+
+# BOTÃO VOLTAR
+
+botao_voltar = Button(
+    janela,
+    text="Voltar ao Menu",
+    bg="gray",
+    fg="white",
+    command=voltar_menu
+)
+
+botao_voltar.pack(pady=10)
+    
 janela.mainloop()

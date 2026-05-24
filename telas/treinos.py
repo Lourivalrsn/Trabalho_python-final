@@ -1,47 +1,82 @@
 from tkinter import *
 from tkinter import ttk
 import sqlite3
+import os
 
+# CAMINHO DO BANCO
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+caminho_banco = os.path.join(BASE_DIR, "esports.db")
+
+# JANELA
 janela = Tk()
 
 janela.title("Registro de Treinos")
+janela.geometry("700x500")
 
-janela.geometry("500x400")
-
+# TITULO
 Label(
     janela,
     text="Registro de Treinos",
     font=("Arial",20)
 ).pack(pady=20)
 
-# JOGADOR
+# CAMPOS
 Label(janela,text="Jogador").pack()
-
 entry_jogador = Entry(janela,width=40)
 entry_jogador.pack()
 
-# HORAS
 Label(janela,text="Horas").pack()
-
 entry_horas = Entry(janela,width=40)
 entry_horas.pack()
 
-# DATA
 Label(janela,text="Data").pack()
-
 entry_data = Entry(janela,width=40)
 entry_data.pack()
 
-# OBS
 Label(janela,text="Observação").pack()
-
 entry_obs = Entry(janela,width=40)
 entry_obs.pack()
+
+# TABELA
+tabela = ttk.Treeview(
+    janela,
+    columns=("id","jogador","horas","data"),
+    show="headings"
+)
+
+tabela.heading("id", text="ID")
+tabela.heading("jogador", text="Jogador")
+tabela.heading("horas", text="Horas")
+tabela.heading("data", text="Data")
+
+tabela.pack(pady=20, fill="both", expand=True)
+
+# CARREGAR TABELA
+def carregar_tabela():
+
+    for item in tabela.get_children():
+        tabela.delete(item)
+
+    conexao = sqlite3.connect(caminho_banco)
+
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+    SELECT id,jogador,horas,data
+    FROM treinos
+    """)
+
+    dados = cursor.fetchall()
+
+    for linha in dados:
+        tabela.insert("", END, values=linha)
+
+    conexao.close()
 
 # SALVAR
 def salvar():
 
-    conexao = sqlite3.connect("esports.db")
+    conexao = sqlite3.connect(caminho_banco)
 
     cursor = conexao.cursor()
 
@@ -58,46 +93,72 @@ def salvar():
     ))
 
     conexao.commit()
-
     conexao.close()
 
-    print("Treino salvo")
+    carregar_tabela()
+
+# APAGAR
+def apagar():
+
+    item = tabela.selection()
+
+    if item:
+
+        valores = tabela.item(item[0], "values")
+
+        id_treino = valores[0]
+
+        conexao = sqlite3.connect(caminho_banco)
+
+        cursor = conexao.cursor()
+
+        cursor.execute(
+            "DELETE FROM treinos WHERE id=?",
+            (id_treino,)
+        )
+
+        conexao.commit()
+        conexao.close()
+
+        carregar_tabela()
+        
+    # VOLTAR MENU
+
+def voltar_menu():
+
+    janela.destroy()
+
+    os.system("python main.py")
+    
+    # BOTÃO VOLTAR
 
 Button(
     janela,
-    text="Salvar Treino",
-    command=salvar
-).pack(pady=20)
+    text="Voltar ao Menu",
+    bg="gray",
+    fg="white",
+    command=voltar_menu
+).pack(pady=10)
 
-# TABELA
-
-tabela = ttk.Treeview(
+# BOTÃO SALVAR
+Button(
     janela,
-    columns=("jogador","horas","data","obs"),
-    show="headings"
-)
+    text="Salvar Treino",
+    bg="green",
+    fg="white",
+    command=salvar
+).pack(pady=10)
 
-tabela.heading("jogador", text="Jogador")
-tabela.heading("horas", text="Horas")
-tabela.heading("data", text="Data")
-tabela.heading("obs", text="Observação")
+# BOTÃO APAGAR
+Button(
+    janela,
+    text="Apagar Treino",
+    bg="red",
+    fg="white",
+    command=apagar
+).pack(pady=10)
 
-tabela.pack(pady=20)
-
-# MOSTRAR TREINOS
-
-conexao = sqlite3.connect("esports.db")
-
-cursor = conexao.cursor()
-
-dados = cursor.execute("""
-SELECT jogador,horas,data,observacao
-FROM treinos
-""")
-
-for treino in dados:
-    tabela.insert("", END, values=treino)
-
-conexao.close()
+# INICIAR
+carregar_tabela()
 
 janela.mainloop()
