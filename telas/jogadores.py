@@ -73,7 +73,6 @@ botao = Button(
 
 botao.pack(pady=10)
 
-janela.mainloop()
 #TABELA
 tabela = ttk.Treeview(
     janela,
@@ -102,3 +101,4 @@ for jogador in dados:
     tabela.insert("", END, values=jogador)
 
 conexao.close()
+janela.mainloop()
