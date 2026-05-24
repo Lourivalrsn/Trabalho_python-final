@@ -128,7 +128,6 @@ def voltar_menu():
 
     janela.destroy()
 
-    os.system("python main.py")
     
     # BOTÃO VOLTAR
 

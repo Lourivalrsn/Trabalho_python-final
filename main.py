@@ -4,13 +4,28 @@ import os
 # FUNÇÕES PARA ABRIR TELAS
 
 def abrir_jogadores():
+
+    janela.withdraw()
+
     os.system("python telas/jogadores.py")
 
+    janela.deiconify()
+
 def abrir_treinos():
+
+    janela.withdraw()
+
     os.system("python telas/treinos.py")
 
+    janela.deiconify()
+
 def abrir_ranking():
+
+    janela.withdraw()
+
     os.system("python telas/ranking.py")
+
+    janela.deiconify()
 
 # JANELA
 janela = Tk()
